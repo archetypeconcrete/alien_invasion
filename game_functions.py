@@ -67,7 +67,7 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
     pygame.display.flip()
 
 
-def update_bullets(bullets):
+def update_bullets(aliens, bullets):
     """Обновляет позиции пуль и уничтожает старые пули."""
     # Обновление позиций пуль.
     bullets.update()
@@ -75,6 +75,9 @@ def update_bullets(bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+    # Проверка попаданий в пришельцев
+    # При обнаружении попадания удалить пулю и пришельца
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
 
 
 def create_fleet(ai_settings, screen, ship, aliens):
@@ -93,12 +96,12 @@ def create_fleet(ai_settings, screen, ship, aliens):
 
     # Создание первого ряда пришельцев
     # for alien_number in range(number_aliens_x):
-        # Создание пришельца и размещение его в ряду
-        # create_alien(ai_settings, screen, aliens, alien_number)
-        # alien = Alien(ai_settings, screen)
-        # alien.x = alien_width + 2 * alien_width * alien_number
-        # alien.rect.x = alien.x
-        # aliens.add(alien)
+    # Создание пришельца и размещение его в ряду
+    # create_alien(ai_settings, screen, aliens, alien_number)
+    # alien = Alien(ai_settings, screen)
+    # alien.x = alien_width + 2 * alien_width * alien_number
+    # alien.rect.x = alien.x
+    # aliens.add(alien)
 
 
 def get_number_aliens_x(ai_settings, alien_width):
@@ -123,3 +126,32 @@ def get_number_rows(ai_settings, ship_height, alien_height):
     available_space_y = (ai_settings.screen_height - (3 * alien_height) - ship_height)
     number_rows = int(available_space_y / (2 * alien_height))
     return number_rows
+
+
+# def update_aliens(aliens):
+#     """Обновляет позиции всех пришельцев во флоте"""
+#     aliens.update()
+
+
+def check_fleet_edges(ai_settings, aliens):
+    """Реагирует на достидение пришельцем края экрана"""
+    for alien in aliens.sprites():
+        if alien.check_edges():
+            change_fleet_direction(ai_settings, aliens)
+            break
+
+
+def change_fleet_direction(ai_settings, aliens):
+    """Отпускает весь флот и меняет направление флота"""
+    for alien in aliens.sprites():
+        alien.rect.y += ai_settings.fleet_drop_speed
+    ai_settings.fleet_direction *= -1
+
+
+def update_aliens(ai_settings, aliens):
+    """
+    Проверяет, достиг ли флот края экрана,
+    после чего обновляет позиции всех пришельцев
+    """
+    check_fleet_edges(ai_settings, aliens)
+    aliens.update()

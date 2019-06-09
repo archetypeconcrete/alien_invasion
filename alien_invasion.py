@@ -29,14 +29,8 @@ def run_game():
         # Отслеживание событий клавиатуры и мыши
         gf.check_events(ai_settings, screen, ship, bullets)
         ship.update()
-        gf.update_bullets(bullets)
-        """ bullets.update()
-
-        # Удаление пуль, вышедших за край экрана.
-        for bullet in bullets.copy():
-            if bullet.rect.bottom <= 0:
-                bullets.remove(bullet)
-        print(len(bullets)) """
+        gf.update_bullets(aliens, bullets)
+        gf.update_aliens(ai_settings, aliens)
         gf.update_screen(ai_settings, screen, ship, aliens, bullets)
 
 
