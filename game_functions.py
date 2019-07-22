@@ -57,18 +57,25 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
 
 def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y):
     """Запускает новую игру при нажатии кнопки Play."""
-    if play_button.rect.collidepoint(mouse_x, mouse_y):
-        # Сброс игровой статистики
-        stats.reset_stats()
-        stats.game_active = True
+    button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:
+        # Сброс игровых настроек.
+        ai_settings.initialize_dynamic_settings()
+        # Указатель мыши скрывается.
+        pygame.mouse.set_visible(False)
 
-        # Очистка списков пришельцев и пуль.
-        aliens.empty()
-        bullets.empty()
+        if play_button.rect.collidepoint(mouse_x, mouse_y):
+            # Сброс игровой статистики
+            stats.reset_stats()
+            stats.game_active = True
 
-        # Создание нового флота и размещение корабля в центре.
-        create_fleet(ai_settings, screen, ship, aliens)
-        ship.center_ship()
+            # Очистка списков пришельцев и пуль.
+            aliens.empty()
+            bullets.empty()
+
+            # Создание нового флота и размещение корабля в центре.
+            create_fleet(ai_settings, screen, ship, aliens)
+            ship.center_ship()
 
 
 def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
@@ -107,6 +114,7 @@ def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
     if len(aliens) == 0:
         # Уничтожение существующих пуль и создание нового флота
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
 
 
@@ -213,6 +221,7 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
         sleep(0.5)
     else:
         stats.game_active = False
+        pygame.mouse.set_visible(True)
 
 
 def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
